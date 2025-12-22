@@ -1,3 +1,7 @@
-export default function Home() {
-  return <h2>Home Page</h2>;
-}
+import FileUpload from "../components/FileUpload";
+
+const Home = () => {
+  return <FileUpload />;
+};
+
+export default Home;
