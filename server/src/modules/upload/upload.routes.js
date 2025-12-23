@@ -1,12 +1,11 @@
 import express from "express";
 import cloudinary from "../../config/cloudinary.js";
-
-import {protect} from "../../middlewares/auth.middleware.js";
-
+import { protect } from "../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/signature",protect, (req, res) => {
+/* ---------------- AUTHENTICATED USER ---------------- */
+router.get("/signature", protect, (req, res) => {
   const timestamp = Math.round(Date.now() / 1000);
 
   const signature = cloudinary.utils.api_sign_request(
@@ -25,7 +24,8 @@ router.get("/signature",protect, (req, res) => {
     folder: `notes/${req.userId}`,
   });
 });
-// Guest upload (no login required)
+
+/* ---------------- GUEST USER ---------------- */
 router.get("/guest-signature", (req, res) => {
   const timestamp = Math.round(Date.now() / 1000);
 
@@ -47,3 +47,4 @@ router.get("/guest-signature", (req, res) => {
 });
 
 export default router;
+

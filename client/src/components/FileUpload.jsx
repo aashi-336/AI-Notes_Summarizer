@@ -3,7 +3,10 @@ import { uploadToCloudinary } from "../services/cloudinary";
 
 const FileUpload = () => {
   const [uploading, setUploading] = useState(false);
+  // const [fileInfo, setFileInfo] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
+const [previewUrl, setPreviewUrl] = useState(null);
+
   const [error, setError] = useState("");
 
   const handleFile = async (file) => {
@@ -30,11 +33,17 @@ const FileUpload = () => {
       // token = null → guest upload
       const result = await uploadToCloudinary(file, null);
 
-      setFileInfo({
-        url: result.secure_url,
-        publicId: result.public_id,
-        type: result.resource_type,
-      });
+    setFileInfo({
+  rawUrl: result.raw.secure_url,        // 🔑 for AI later
+  rawPublicId: result.raw.public_id,
+  type: result.raw.resource_type,
+});
+
+setPreviewUrl(
+  result.preview ? result.preview.secure_url : null
+);
+
+
     } catch (err) {
       console.error(err);
       setError("Upload failed");
@@ -55,11 +64,13 @@ const FileUpload = () => {
   const onDragOver = (e) => {
     e.preventDefault();
   };
-  const handleClear = () => {
+const handleClear = () => {
   setFileInfo(null);
+  setPreviewUrl(null);
   setError("");
   setUploading(false);
 };
+
 
   return (
     <div style={{ maxWidth: "400px", margin: "2rem auto", textAlign: "center" }}>
@@ -88,9 +99,21 @@ const FileUpload = () => {
     <p>Upload successful ✅</p>
     <p>Type: {fileInfo.type}</p>
 
-    <a href={fileInfo.url} target="_blank" rel="noreferrer">
-      View file
-    </a>
+    
+{previewUrl && fileInfo.type === "image" && (
+  <div style={{ marginTop: "1rem" }}>
+    <button
+      onClick={() => window.open(previewUrl, "_blank")}
+      style={{
+        padding: "10px 14px",
+        cursor: "pointer",
+        borderRadius: "6px",
+      }}
+    >
+      Open Image Preview 🔗
+    </button>
+  </div>
+)}
 
     <div style={{ marginTop: "1rem" }}>
       <button onClick={handleClear}>Clear</button>
