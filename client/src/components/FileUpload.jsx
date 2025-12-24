@@ -1,18 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { uploadToCloudinary } from "../services/cloudinary";
+import { useFile } from "../context/FileContext";
+import { useAuth } from "../context/AuthContext";
 
 const FileUpload = () => {
-  const [uploading, setUploading] = useState(false);
-  // const [fileInfo, setFileInfo] = useState(null);
-  const [fileInfo, setFileInfo] = useState(null);
-const [previewUrl, setPreviewUrl] = useState(null);
+  const navigate = useNavigate();
+  const { setFileInfo } = useFile();
+  const { token, isAuthenticated } = useAuth(); // ✅ AUTH CONTEXT
 
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [error, setError] = useState("");
 
   const handleFile = async (file) => {
     if (!file) return;
 
-    // allow only pdf or images
+    // 🔒 AUTH CHECK (STEP 2 RULE)
+    if (!isAuthenticated || !token) {
+      setError("Please login to upload files");
+      return;
+    }
+
     const allowedTypes = [
       "application/pdf",
       "image/png",
@@ -30,96 +39,56 @@ const [previewUrl, setPreviewUrl] = useState(null);
       setError("");
       setUploading(true);
 
-      // token = null → guest upload
-      const result = await uploadToCloudinary(file, null);
+      // 🔒 AUTHENTICATED UPLOAD
+      const result = await uploadToCloudinary(file, token);
 
-    setFileInfo({
-  rawUrl: result.raw.secure_url,        // 🔑 for AI later
-  rawPublicId: result.raw.public_id,
-  type: result.raw.resource_type,
-});
+      const isPdf = file.type === "application/pdf";
 
-setPreviewUrl(
-  result.preview ? result.preview.secure_url : null
-);
+      const info = {
+        rawUrl: result.raw.secure_url,
+        rawPublicId: result.raw.public_id,
+        fileType: isPdf ? "pdf" : "image",
+      };
 
+      // ✅ STORE FILE INFO GLOBALLY
+      setFileInfo(info);
 
+      // Image preview only
+      setPreviewUrl(
+        !isPdf && result.preview ? result.preview.secure_url : null
+      );
+
+      navigate("/summary");
     } catch (err) {
       console.error(err);
-      setError("Upload failed");
+      setError(err.message || "Upload failed");
     } finally {
       setUploading(false);
     }
   };
 
-  const onFileChange = (e) => {
-    handleFile(e.target.files[0]);
-  };
-
-  const onDrop = (e) => {
-    e.preventDefault();
-    handleFile(e.dataTransfer.files[0]);
-  };
-
-  const onDragOver = (e) => {
-    e.preventDefault();
-  };
-const handleClear = () => {
-  setFileInfo(null);
-  setPreviewUrl(null);
-  setError("");
-  setUploading(false);
-};
-
-
   return (
     <div style={{ maxWidth: "400px", margin: "2rem auto", textAlign: "center" }}>
       <h2>Upload your document</h2>
 
-      <div
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        style={{
-          border: "2px dashed #888",
-          padding: "2rem",
-          marginBottom: "1rem",
-          cursor: "pointer",
-        }}
-      >
-        Drag & drop file here
-      </div>
-
-      <input type="file" onChange={onFileChange} />
+      <input
+        type="file"
+        onChange={(e) => handleFile(e.target.files[0])}
+      />
 
       {uploading && <p>Uploading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      
-{fileInfo && (
-  <div style={{ marginTop: "1rem" }}>
-    <p>Upload successful ✅</p>
-    <p>Type: {fileInfo.type}</p>
 
-    
-{previewUrl && fileInfo.type === "image" && (
-  <div style={{ marginTop: "1rem" }}>
-    <button
-      onClick={() => window.open(previewUrl, "_blank")}
-      style={{
-        padding: "10px 14px",
-        cursor: "pointer",
-        borderRadius: "6px",
-      }}
-    >
-      Open Image Preview 🔗
-    </button>
-  </div>
-)}
-
-    <div style={{ marginTop: "1rem" }}>
-      <button onClick={handleClear}>Clear</button>
-    </div>
-  </div>
-)}
+      {previewUrl && (
+        <div style={{ marginTop: "1rem" }}>
+          <button
+            onClick={() => window.open(previewUrl, "_blank")}
+            style={{ padding: "10px 14px", cursor: "pointer" }}
+          >
+            Open Image Preview 🔗
+          </button>
+        </div>
+      )}
     </div>
   );
 };

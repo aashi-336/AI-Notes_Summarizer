@@ -5,8 +5,8 @@ import { protect } from "./middlewares/auth.middleware.js";
 import notesRoutes from "./modules/notes/notes.routes.js";
 import uploadRoutes from "./modules/upload/upload.routes.js";
 import extractRoutes from "./modules/extract/extract.routes.js";
-import summarizeRoutes from "./modules/summarize/summarize.routes.js";
-
+// import summarizeRoutes from "./modules/summarize/summarize.routes.js";
+import pipelineRoutes from "./modules/pipeline/pipeline.routes.js";
 
 const app = express();
 
@@ -25,5 +25,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/extract", extractRoutes);
-app.use("/api/summarize", summarizeRoutes);
+// app.use("/api/summarize", summarizeRoutes);
+app.use("/api/pipeline", pipelineRoutes);
 export default app;

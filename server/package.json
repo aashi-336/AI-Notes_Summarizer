@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
@@ -22,6 +23,7 @@
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "pdf-parse": "^2.4.5",
+    "pdf-poppler": "^0.2.3",
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
