@@ -11,7 +11,7 @@ export const summarizeWithHF = async (text) => {
         inputs: text,
         parameters: {
           max_length: 130,
-          min_length: 40,
+          min_length: 100,
           do_sample: false,
         },
       },

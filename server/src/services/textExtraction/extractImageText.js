@@ -9,7 +9,7 @@ export const extractImageText = async (imageBuffer) => {
   });
 
   const response = await axios.post(
-    "http://127.0.0.1:9000/ocr",
+    "http://127.0.0.1:8000/ocr",
     form,
     { headers: form.getHeaders(), timeout: 60000 }
   );
