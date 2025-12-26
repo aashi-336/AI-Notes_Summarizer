@@ -1,7 +1,7 @@
 import axios from "axios";
-import { extractPdfText } from "../../services/textExtraction/extractPdfText.js";
 import { extractImageText } from "../../services/textExtraction/extractImageText.js";
-import { summarizeText } from "../../services/summarization/summarizeText.service.js";
+import { summarizeWithHF } from "../../services/summarization/huggingfaceSummary.service.js";
+
 import Note from "../notes/notes.model.js";
 
 const SUMMARY_TYPES = ["concise", "exam", "key-points", "headings"];
@@ -10,7 +10,7 @@ export const uploadAndSummarize = async (req, res) => {
   try {
     const {
       fileUrl,
-      fileType, // "pdf" | "image"
+      fileType, // "image"
       summaryType = "concise",
       language = "en",
       fileMeta,
@@ -18,9 +18,9 @@ export const uploadAndSummarize = async (req, res) => {
 
     /* ---------------- VALIDATION ---------------- */
 
-    if (!["pdf", "image"].includes(fileType)) {
+    if (fileType !== "image") {
       return res.status(400).json({
-        message: "Invalid fileType. Must be 'pdf' or 'image'",
+        message: "Only image summarization is enabled right now",
       });
     }
 
@@ -32,80 +32,51 @@ export const uploadAndSummarize = async (req, res) => {
       return res.status(400).json({ message: "Invalid summary type" });
     }
 
-    /* ---------------- DOWNLOAD FILE ---------------- */
+    /* ---------------- DOWNLOAD IMAGE ---------------- */
 
-    const downloadUrl =
-      fileType === "pdf" ? `${fileUrl}?download=1` : fileUrl;
+    console.log("⬇️ Downloading image from Cloudinary...");
 
-    const fileResponse = await axios.get(downloadUrl, {
+    const fileResponse = await axios.get(fileUrl, {
       responseType: "arraybuffer",
       timeout: 20000,
     });
 
     const buffer = Buffer.from(fileResponse.data);
 
-    /* ---------------- PDF SAFETY CHECK ---------------- */
+    console.log("✅ Image downloaded, size:", buffer.length, "bytes");
 
-    if (fileType === "pdf") {
-      const header = buffer.slice(0, 5).toString();
-      console.log("📄 PDF HEADER:", header);
+    /* ---------------- OCR (PYTHON SERVICE) ---------------- */
 
-      if (!header.startsWith("%PDF")) {
-        return res.json({
-          summary: {
-            text:
-              "⚠️ This file is not a valid PDF or Cloudinary returned a non-PDF response.",
-            type: summaryType,
-            language,
-          },
-        });
-      }
-    }
+    console.log("🧠 Sending image to OCR service...");
 
-    /* ---------------- EXTRACT TEXT ---------------- */
+    const extractedText = await extractImageText(buffer);
 
-    let extractedText = "";
-
-    if (fileType === "pdf") {
-      try {
-        extractedText = await extractPdfText(buffer);
-      } catch (err) {
-        console.error("❌ pdf-parse failed:", err);
-        return res.json({
-          summary: {
-            text:
-              "⚠️ This PDF cannot be read. It may be scanned, encrypted, or corrupted.",
-            type: summaryType,
-            language,
-          },
-        });
-      }
-    }
-
-    if (fileType === "image") {
-      extractedText = await extractImageText(buffer);
-    }
+    console.log("\n===== OCR OUTPUT =====\n");
+    console.log(extractedText);
+    console.log("\n======================\n");
 
     if (!extractedText || extractedText.trim().length < 20) {
       return res.json({
         summary: {
-          text:
-            "⚠️ Unable to extract meaningful text from this document.",
+          text: "⚠️ Unable to extract meaningful text from this image.",
           type: summaryType,
           language,
         },
       });
     }
 
-    /* ---------------- SUMMARIZE ---------------- */
+    /* ---------------- SUMMARIZATION ---------------- */
 
-    const summaryText = await summarizeText(
-      extractedText,
-      summaryType,
-      language
-    );
+    console.log("✂️ Summarizing extracted text...");
 
-    /* ---------------- SAVE ---------------- */
+    const summaryText = await summarizeWithHF(extractedText);
+
+    console.log("\n===== SUMMARY OUTPUT =====\n");
+console.log(summaryText);
+console.log("\n==========================\n");
+
+
+    /* ---------------- SAVE (OPTIONAL) ---------------- */
 
     if (req.userId && fileMeta) {
       await Note.create({
@@ -113,7 +84,7 @@ export const uploadAndSummarize = async (req, res) => {
         originalFile: {
           url: fileMeta.url,
           publicId: fileMeta.publicId,
-          fileType,
+          fileType: "image",
         },
         summary: {
           text: summaryText,
@@ -123,6 +94,8 @@ export const uploadAndSummarize = async (req, res) => {
       });
     }
 
+    /* ---------------- RESPONSE ---------------- */
+
     return res.json({
       summary: {
         text: summaryText,
@@ -131,9 +104,9 @@ export const uploadAndSummarize = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ PIPELINE CRASH:", error);
+    console.error("❌ IMAGE PIPELINE CRASH:", error);
     return res.status(500).json({
-      message: "Summarization pipeline failed",
+      message: "Image summarization pipeline failed",
     });
   }
 };
