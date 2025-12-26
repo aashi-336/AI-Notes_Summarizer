@@ -4,3 +4,33 @@ dist/
 build/
 .DS_Store
 server/google-vision-key.json
+# ===== ENV FILES =====
+.env
+.env.local
+.env.production
+
+# ===== PYTHON =====
+venv/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== NODE =====
+node_modules/
+dist/
+build/
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+
+# ===== LOGS =====
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ===== IDE =====
+.vscode/
+.idea/
