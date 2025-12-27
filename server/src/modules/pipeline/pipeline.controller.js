@@ -1,10 +1,13 @@
 import axios from "axios";
 import { extractImageText } from "../../services/textExtraction/extractImageText.js";
 import { summarizeWithHF } from "../../services/summarization/huggingfaceSummary.service.js";
+import { translateText } from "../../services/translation/translateText.service.js";
+import { cleanOCRText } from "../../services/textProcessing/cleanOCRText.js";
 
 import Note from "../notes/notes.model.js";
 
-const SUMMARY_TYPES = ["concise", "exam", "key-points", "headings"];
+const SUMMARY_TYPES = ["concise", "standard", "detailed"];
+
 
 export const uploadAndSummarize = async (req, res) => {
   try {
@@ -49,7 +52,12 @@ export const uploadAndSummarize = async (req, res) => {
 
     console.log("🧠 Sending image to OCR service...");
 
+    // const extractedText = await extractImageText(buffer);
     const extractedText = await extractImageText(buffer);
+
+// 🧹 Clean OCR garbage
+const cleanedText = cleanOCRText(extractedText);
+
 
     console.log("\n===== OCR OUTPUT =====\n");
     console.log(extractedText);
@@ -64,41 +72,48 @@ export const uploadAndSummarize = async (req, res) => {
         },
       });
     }
+/* ---------------- SUMMARIZATION ---------------- */
 
-    /* ---------------- SUMMARIZATION ---------------- */
+console.log("✂️ Summarizing extracted text...");
 
-    console.log("✂️ Summarizing extracted text...");
+// 1️⃣ Always summarize in English
+const englishSummary = await summarizeWithHF(cleanedText);
 
-    const summaryText = await summarizeWithHF(extractedText);
+// 2️⃣ Translate if needed
+const finalSummary =
+  language === "en"
+    ? englishSummary
+    : await translateText(englishSummary, language);
 
-    console.log("\n===== SUMMARY OUTPUT =====\n");
-console.log(summaryText);
+console.log("\n===== SUMMARY OUTPUT =====\n");
+console.log(finalSummary);
 console.log("\n==========================\n");
 
+/* ---------------- SAVE (OPTIONAL) ---------------- */
 
-    /* ---------------- SAVE (OPTIONAL) ---------------- */
-
-    if (req.userId && fileMeta) {
-      await Note.create({
-        userId: req.userId,
-        originalFile: {
-          url: fileMeta.url,
-          publicId: fileMeta.publicId,
-          fileType: "image",
-        },
-        summary: {
-          text: summaryText,
-          type: summaryType,
-          language,
-        },
-      });
-    }
+if (req.userId && fileMeta) {
+  await Note.create({
+    userId: req.userId,
+    originalFile: {
+      url: fileMeta.url,
+      publicId: fileMeta.publicId,
+      fileType: "image",
+    },
+    summary: {
+      text: finalSummary,   // ✅ FIXED
+      type: summaryType,
+      language,
+    },
+  });
+}
 
     /* ---------------- RESPONSE ---------------- */
 
     return res.json({
       summary: {
-        text: summaryText,
+        // text: summaryText,
+        text: finalSummary,
+
         type: summaryType,
         language,
       },

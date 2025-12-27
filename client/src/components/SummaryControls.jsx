@@ -12,10 +12,9 @@ const SummaryControls = ({
         value={summaryType}
         onChange={(e) => setSummaryType(e.target.value)}
       >
-        <option value="concise">Concise</option>
-        <option value="exam">Exam</option>
-        <option value="key-points">Key Points</option>
-        <option value="headings">Headings</option>
+         <option value="concise">Concise</option>
+  <option value="standard">Standard</option>
+  <option value="detailed">Detailed</option>
       </select>
 
       <select
@@ -23,8 +22,10 @@ const SummaryControls = ({
         onChange={(e) => setLanguage(e.target.value)}
         style={{ marginLeft: "10px" }}
       >
-        <option value="en">English</option>
-        <option value="hi">Hindi</option>
+   <option value="en">English</option>
+  <option value="hi">Hindi</option>
+
+ 
       </select>
 
       <button
