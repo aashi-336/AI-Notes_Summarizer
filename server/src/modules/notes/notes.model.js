@@ -36,5 +36,9 @@ const noteSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+// 🔍 TEXT INDEX FOR SEARCH
+noteSchema.index({
+  "summary.text": "text",
+});
 
 export default mongoose.model("Note", noteSchema);

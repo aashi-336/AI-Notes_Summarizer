@@ -48,7 +48,14 @@ const SummaryPanel = ({ fileInfo }) => {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <SummaryResult summary={summary} />
+      {/* <SummaryResult summary={summary} /> */}
+      <SummaryResult
+  summary={summary}
+  fileInfo={fileInfo}
+  summaryType={summaryType}
+  language={language}
+/>
+
     </div>
   );
 };

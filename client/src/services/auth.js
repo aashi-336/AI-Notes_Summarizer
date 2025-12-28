@@ -1,9 +1,12 @@
 const BACKEND_URL = "http://localhost:5001";
 
+// 🔐 SIGNUP
 export const signup = async ({ name, email, password }) => {
   const res = await fetch(`${BACKEND_URL}/api/auth/signup`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ name, email, password }),
   });
 
@@ -16,10 +19,13 @@ export const signup = async ({ name, email, password }) => {
   return data; // { message }
 };
 
+// 🔐 LOGIN
 export const login = async ({ email, password }) => {
   const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ email, password }),
   });
 
