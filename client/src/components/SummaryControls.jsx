@@ -7,33 +7,32 @@ const SummaryControls = ({
   loading,
 }) => {
   return (
-    <div style={{ marginTop: "1rem" }}>
+    <div className="controls-section">
       <select
         value={summaryType}
         onChange={(e) => setSummaryType(e.target.value)}
+        className="control-select"
       >
-         <option value="concise">Concise</option>
-  <option value="standard">Standard</option>
-  <option value="detailed">Detailed</option>
+        <option value="concise">Concise</option>
+        <option value="standard">Standard</option>
+        <option value="detailed">Detailed</option>
       </select>
 
       <select
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
-        style={{ marginLeft: "10px" }}
+        className="control-select"
       >
-   <option value="en">English</option>
-  <option value="hi">Hindi</option>
-
- 
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
       </select>
 
       <button
         onClick={onGenerate}
         disabled={loading}
-        style={{ marginLeft: "10px" }}
+        className="btn-generate"
       >
-        {loading ? "Generating..." : "Generate"}
+        {loading ? "Generating..." : "Generate Summary"}
       </button>
     </div>
   );

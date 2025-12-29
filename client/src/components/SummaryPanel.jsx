@@ -7,34 +7,22 @@ const SummaryPanel = ({ fileInfo }) => {
   const [summaryType, setSummaryType] = useState("concise");
   const [language, setLanguage] = useState("en");
 
-  const {
-    summary,
-    loading,
-    error,
-    generateSummary,
-  } = usePipelineSummary();
+  const { summary, loading, error, generateSummary } = usePipelineSummary();
 
   return (
-    <div style={{ marginTop: "1.5rem" }}>
-      <h4>Generate Summary</h4>
+    <div className="summary-panel">
       {/* Image Preview */}
-{fileInfo?.rawUrl && fileInfo.fileType === "image" && (
-  <div style={{ marginBottom: "1rem" }}>
-    <h4>Uploaded Image Preview</h4>
-    <img
-      src={fileInfo.rawUrl}
-      alt="Uploaded preview"
-      style={{
-        maxWidth: "100%",
-        maxHeight: "300px",
-        borderRadius: "8px",
-        border: "1px solid #ccc",
-        objectFit: "contain",
-      }}
-    />
-  </div>
-)}
+      {fileInfo?.rawUrl && fileInfo.fileType === "image" && (
+        <div className="image-preview-section">
+          <img
+            src={fileInfo.rawUrl}
+            alt="Uploaded preview"
+            className="preview-image"
+          />
+        </div>
+      )}
 
+      {/* Controls */}
       <SummaryControls
         summaryType={summaryType}
         setSummaryType={setSummaryType}
@@ -46,16 +34,16 @@ const SummaryPanel = ({ fileInfo }) => {
         }
       />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {/* Error */}
+      {error && <div className="error-message">{error}</div>}
 
-      {/* <SummaryResult summary={summary} /> */}
+      {/* Summary Result */}
       <SummaryResult
-  summary={summary}
-  fileInfo={fileInfo}
-  summaryType={summaryType}
-  language={language}
-/>
-
+        summary={summary}
+        fileInfo={fileInfo}
+        summaryType={summaryType}
+        language={language}
+      />
     </div>
   );
 };
