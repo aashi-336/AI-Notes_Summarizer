@@ -4,9 +4,9 @@ dotenv.config(); // 👈 MUST be FIRST
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
 
-const PORT = 5001;
+// const PORT = 5001;
+const PORT = process.env.PORT || 5001; // 👈 FIX
 
-console.log("🔑 GEMINI KEY LOADED:", !!process.env.GEMINI_API_KEY);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
