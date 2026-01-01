@@ -1,0 +1,11 @@
+/* Save message below Save button */
+.save-message {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}

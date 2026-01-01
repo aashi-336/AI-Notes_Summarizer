@@ -1,0 +1,27 @@
+/* SAFE PREFIX: sn- */
+
+.sn-toast-success {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #16a34a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  z-index: 10000;
+  animation: sn-slide-in 0.3s ease;
+}
+
+@keyframes sn-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

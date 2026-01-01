@@ -1,0 +1,72 @@
+/* ================================
+   Saved Notes – Confirm Modal
+   (NO CLASH, PREFIXED)
+================================ */
+
+/* full-screen overlay */
+.sn-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* modal box */
+.sn-confirm-box {
+  background: white;
+  padding: 24px 32px;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* text */
+.sn-confirm-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+/* buttons container */
+.sn-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* yes */
+.sn-btn-confirm {
+  padding: 8px 20px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sn-btn-confirm:hover {
+  background: #b91c1c;
+}
+
+/* no */
+.sn-btn-cancel {
+  padding: 8px 20px;
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sn-btn-cancel:hover {
+  background: #d1d5db;
+}
