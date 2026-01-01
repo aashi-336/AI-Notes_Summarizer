@@ -8,6 +8,8 @@ import Note from "../notes/notes.model.js";
 
 const SUMMARY_TYPES = ["concise", "standard", "detailed"];
 
+// 🧠 In-memory OCR cache (key = image URL)
+const ocrCache = new Map();
 
 export const uploadAndSummarize = async (req, res) => {
   try {
@@ -37,41 +39,87 @@ export const uploadAndSummarize = async (req, res) => {
 
     /* ---------------- DOWNLOAD IMAGE ---------------- */
 
-    console.log("⬇️ Downloading image from Cloudinary...");
+    // console.log("⬇️ Downloading image from Cloudinary...");
 
-    const fileResponse = await axios.get(fileUrl, {
-      responseType: "arraybuffer",
-      timeout: 20000,
-    });
+    // const fileResponse = await axios.get(fileUrl, {
+    //   responseType: "arraybuffer",
+    //   timeout: 20000,
+    // });
 
-    const buffer = Buffer.from(fileResponse.data);
+    // const buffer = Buffer.from(fileResponse.data);
 
-    console.log("✅ Image downloaded, size:", buffer.length, "bytes");
+    // console.log("✅ Image downloaded, size:", buffer.length, "bytes");
+    let buffer = null;
 
-    /* ---------------- OCR (PYTHON SERVICE) ---------------- */
+// ⬇️ Download image ONLY if OCR is not cached
+if (!ocrCache.has(fileUrl)) {
+  console.log("⬇️ Downloading image from Cloudinary...");
 
-    console.log("🧠 Sending image to OCR service...");
+  const fileResponse = await axios.get(fileUrl, {
+    responseType: "arraybuffer",
+    timeout: 20000,
+  });
 
-    // const extractedText = await extractImageText(buffer);
-    const extractedText = await extractImageText(buffer);
+  buffer = Buffer.from(fileResponse.data);
+}
 
-// 🧹 Clean OCR garbage
-const cleanedText = cleanOCRText(extractedText);
+//     /* ---------------- OCR (PYTHON SERVICE) ---------------- */
 
+//     console.log("🧠 Sending image to OCR service...");
+
+//     // const extractedText = await extractImageText(buffer);
+//     const extractedText = await extractImageText(buffer);
+
+// // 🧹 Clean OCR garbage
+// const cleanedText = cleanOCRText(extractedText);
+
+
+//     console.log("\n===== OCR OUTPUT =====\n");
+//     console.log(extractedText);
+//     console.log("\n======================\n");
+
+//     if (!extractedText || extractedText.trim().length < 20) {
+//       return res.json({
+//         summary: {
+//           text: "⚠️ Unable to extract meaningful text from this image.",
+//           type: summaryType,
+//           language,
+//         },
+//       });
+//     }
+/* ---------------- OCR (WITH CACHE) ---------------- */
+
+let cleanedText;
+
+// 🔁 Check cache first
+if (ocrCache.has(fileUrl)) {
+  console.log("⚡ Using cached OCR text");
+  cleanedText = ocrCache.get(fileUrl);
+} else {
+  console.log("🧠 Sending image to OCR service...");
+
+  const extractedText = await extractImageText(buffer);
+  cleanedText = cleanOCRText(extractedText);
 
     console.log("\n===== OCR OUTPUT =====\n");
-    console.log(extractedText);
+    console.log(cleanedText);
     console.log("\n======================\n");
 
-    if (!extractedText || extractedText.trim().length < 20) {
-      return res.json({
-        summary: {
-          text: "⚠️ Unable to extract meaningful text from this image.",
-          type: summaryType,
-          language,
-        },
-      });
-    }
+   
+  // 🧠 Store in cache
+  ocrCache.set(fileUrl, cleanedText);
+}
+if (!cleanedText || cleanedText.trim().length < 20) {
+  return res.json({
+    summary: {
+      text: "⚠️ Unable to extract meaningful text from this image.",
+      type: summaryType,
+      language,
+    },
+  });
+}
+
+
 /* ---------------- SUMMARIZATION ---------------- */
 
 console.log("✂️ Summarizing extracted text...");
