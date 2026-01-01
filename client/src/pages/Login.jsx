@@ -79,7 +79,7 @@ import { useState } from "react";
 import { login } from "../services/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Auth.css";
+import "../styles/auth.css";
 
 
 const Login = () => {

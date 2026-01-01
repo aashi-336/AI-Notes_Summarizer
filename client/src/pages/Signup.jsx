@@ -208,7 +208,7 @@ const Signup = () => {
         <div className="auth-footer">
           <p className="footer-text">
             Already have an account?{" "}
-            <Link to="/login" className="auth-link">
+            <Link to="/" className="auth-link">
               Login
             </Link>
           </p>
