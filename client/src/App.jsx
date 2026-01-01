@@ -7,8 +7,8 @@ import SavedNotesPage from "./pages/SavedNotesPage";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/Home" element={<Home />} />
+      <Route path="/" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/summary" element={<SummaryPage />} />
       <Route path="/saved-notes" element={<SavedNotesPage />} />

@@ -112,7 +112,7 @@ const Signup = () => {
       await signup(form);
 
       // ✅ user created → go to login
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     } finally {

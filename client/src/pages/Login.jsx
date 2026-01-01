@@ -106,7 +106,7 @@ const Login = () => {
 
       const data = await login(form);
       loginUser(data.token);
-      navigate("/");
+      navigate("/Home");
     } catch (err) {
       setError(err.message);
     } finally {
