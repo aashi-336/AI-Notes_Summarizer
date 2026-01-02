@@ -87,7 +87,7 @@ export const fetchMyNotes = async (
 
 export const deleteNote = async (token, noteId) => {
   const res = await fetch(
-    `http://localhost:5001/api/notes/${noteId}`,
+         `${BACKEND_URL}/api/notes/${noteId}`,
     {
       method: "DELETE",
       headers: {
