@@ -8,19 +8,32 @@ import extractRoutes from "./modules/extract/extract.routes.js";
 // import summarizeRoutes from "./modules/summarize/summarize.routes.js";
 import pipelineRoutes from "./modules/pipeline/pipeline.routes.js";
 
+// const app = express();
+
+// // app.use(cors());
+// // app.use(express.json());
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "https://ai-notes-summarizer-coral.vercel.app",
+//     ],
+//     credentials: true,
+//   })
+// );
+
+// app.use(express.json());
 const app = express();
 
-// app.use(cors());
-// app.use(express.json());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://ai-notes-summarizer-coral.vercel.app",
-    ],
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 
