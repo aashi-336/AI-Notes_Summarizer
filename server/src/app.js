@@ -10,8 +10,20 @@ import pipelineRoutes from "./modules/pipeline/pipeline.routes.js";
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+// app.use(express.json());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://ai-notes-summarizer-coral.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
